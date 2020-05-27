@@ -26,6 +26,7 @@
 #include "fonts.h"
 #include "ssd1306.h"
 #include "test.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -121,9 +122,11 @@ int main(void)
   while (1)
   {
 
-
+	  if(count%120==0)
+	  	 	 {
+	  	 	 SSD1306_UpdateScreen();
+	  	 	 }
 	 SSD1306_DrawFilledCircle(x,y,4,1);
-	 SSD1306_UpdateScreen();
 	 x=x+velx;
 	 y=y+vely;
 
@@ -139,34 +142,50 @@ int main(void)
 	 	 	 vely=-vely;
 	 		 }
 
-	 //if(count%6==0)
-	 SSD1306_Clear();
 
-	  count=(count+1)%100;
-	  vely=vely+9.81*.09-vely*.03;
+
+	  vely=vely+9.81*.01-vely*.03;
 	  velx=velx-velx*.01;
 	  if(HAL_GPIO_ReadPin(GPIOC,RU_Pin))
 	 	 {
-	 		 vely=vely-1;
+		  	  if(count%7==0)
+		  	  HAL_Delay(((int)(count*(sin(count)+1)))%15);
+		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
+	 		 vely=vely-.1;
 	 	 }
 
 	  if(HAL_GPIO_ReadPin(GPIOC,RL_Pin))
 	  	 	 {
-	  	 		 velx=velx-1;
+		  	  	  HAL_Delay(((int)(count*(sin(count/4)+1)))%10);
+		  		  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
+	  	 		 velx=velx-.1;
 	  	 	 }
 
 	  if(HAL_GPIO_ReadPin(GPIOA,RR_Pin))
 	  	  	 	 {
-	  	  	 		 velx=velx+1;
+
+		  	  	  	  HAL_Delay(((int)(count*(cos(count*6)+1)))%4);
+		  		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
+
+	  	  	 		 velx=velx+.1;
 	  	  	 	 }
 
 	  if(HAL_GPIO_ReadPin(GPIOA,RD_Pin))
 	  	  	 	 {
-	  	  	 		 vely=vely+1;
+		  	  	  	  if(count%24==0)
+		  	  	  	  {
+		  	  	  	  HAL_Delay(((int)(count*(sin(count*16)+1)))%5);
+		  	  	  	  }
+		  		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
+	  	  	 		 vely=vely+.1;
 	  	  	 	 }
 
 
-
+	  if(count%220==0)
+	 	 {
+	 	 SSD1306_Clear();
+	 	 }
+	  count=(count+1)%560;
   }
 }
   /* USER CODE END 3 */
@@ -300,6 +319,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(AUDIO_OUT_GPIO_Port, AUDIO_OUT_Pin, GPIO_PIN_SET);
+
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
@@ -324,6 +346,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : AUDIO_OUT_Pin */
+  GPIO_InitStruct.Pin = AUDIO_OUT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(AUDIO_OUT_GPIO_Port, &GPIO_InitStruct);
 
 }
 
