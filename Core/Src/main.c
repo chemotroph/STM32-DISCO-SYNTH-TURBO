@@ -97,11 +97,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
-  SSD1306_Init();  // initialise
 
     /// lets print some string
 
-      SSD1306_GotoXY (0,0);
 
 
 
@@ -109,85 +107,87 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  float pitch=1.0;
+  int count=0;
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  int count=0;
-  float x=20;
-  float y=20;
-  float velx=2;
-  float vely=1;
   while (1)
   {
 
-	  if(count%120==0)
-	  	 	 {
-	  	 	 SSD1306_UpdateScreen();
-	  	 	 }
-	 SSD1306_DrawFilledCircle(x,y,4,1);
-	 x=x+velx;
-	 y=y+vely;
-
-	 if(x>=124||x<=4)
-		 {
-		 x=x-velx;
-	 	 velx=-velx;
-		 }
-
-	 if(y>=60||y<=4)
-	 		 {
-	 		 y=y-vely;
-	 	 	 vely=-vely;
-	 		 }
 
 
 
-	  vely=vely+9.81*.01-vely*.03;
-	  velx=velx-velx*.01;
+
 	  if(HAL_GPIO_ReadPin(GPIOC,RU_Pin))
 	 	 {
 		  	  if(count%7==0)
-		  	  HAL_Delay(((int)(count*(sin(count)+1)))%15);
+		  	 // HAL_Delay(((int)(count*(sin(count)+1)))%15+pitch);
 		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
-	 		 vely=vely-.1;
+		  	  HAL_Delay((((int)(pitch*(sin(count+pitch)+1)))%15));
+		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
+
 	 	 }
 
-	  if(HAL_GPIO_ReadPin(GPIOC,RL_Pin))
-	  	 	 {
-		  	  	  HAL_Delay(((int)(count*(sin(count/4)+1)))%10);
-		  		  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
-	  	 		 velx=velx-.1;
-	  	 	 }
+
 
 	  if(HAL_GPIO_ReadPin(GPIOA,RR_Pin))
 	  	  	 	 {
 
-		  	  	  	  HAL_Delay(((int)(count*(cos(count*6)+1)))%4);
+		  	  	  	  HAL_Delay(pitch+1);
 		  		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
 
-	  	  	 		 velx=velx+.1;
+
 	  	  	 	 }
 
 	  if(HAL_GPIO_ReadPin(GPIOA,RD_Pin))
 	  	  	 	 {
-		  	  	  	  if(count%24==0)
-		  	  	  	  {
-		  	  	  	  HAL_Delay(((int)(count*(sin(count*16)+1)))%5);
-		  	  	  	  }
+
+		  	  	  	  HAL_Delay(((int)(pitch*(sin(pitch*count*16)+1)))%3);
+
 		  		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
-	  	  	 		 vely=vely+.1;
 	  	  	 	 }
 
+	  if(HAL_GPIO_ReadPin(GPIOC,RL_Pin))
+	  	  	  	 	 {
 
-	  if(count%220==0)
-	 	 {
-	 	 SSD1306_Clear();
-	 	 }
-	  count=(count+1)%560;
+
+	  		  	  	  	  HAL_Delay(pitch);
+
+	  		  		  	  HAL_GPIO_TogglePin(GPIOB, AUDIO_OUT_Pin);
+	  	  	  	 	 }
+
+
+
+
+	  if(HAL_GPIO_ReadPin(GPIOC,LL_Pin)&&pitch>1)
+	  {
+		  pitch=pitch-1;
+		  count=rand()%220;
+	  }
+
+	  if(HAL_GPIO_ReadPin(GPIOC,LR_Pin))
+	  	  {
+
+
+	  	  }
+
+
+
+  if(HAL_GPIO_ReadPin(GPIOC,LU_Pin) &&pitch<50)
+  		  	  {pitch=pitch+1;}
+
+  	  //if(HAL_GPIO_ReadPin(GPIOC,LD_Pin)&&pitch>1&&count%50==0)
+  	//  {						PROTOTYPE BUTTON BROKE
+  	//	  	pitch=pitch-1;
+  	  //}
+
+
+	  count=(count+1)%220;
   }
-}
+
   /* USER CODE END 3 */
 }
 
